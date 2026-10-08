@@ -39,7 +39,7 @@ def _(mo):
 
     | Дел | Тема | Пример во тетратката |
     |---|---|---|
-    | 1.1 | Општ облик $x=\pm d_0.d_1\cdots d_{p-1}\times\beta^e$ | „Играчка“ систем со подвижна точка на бројна оска |
+    | 1.1 | Општ облик $x=\pm d_0.d_1\cdots d_{p-1}\times\beta^e$ | Систем за илустрација со подвижна точка на бројна оска |
     | 1.1 | Фиксна vs подвижна точка | $0.120\times0.120$ со 3 цифри |
     | 1.2 | Бинарен систем | Бинарна претстава на 0.1 и заокружување на $p$ бити |
     | 1.3–1.4 | Заокружување и грешка | Релативна грешка $\delta$ и граница $u=\tfrac12\beta^{1-p}$ |
@@ -59,7 +59,7 @@ def _(mo):
     $$x = \pm\, d_0.d_1 d_2\cdots d_{p-1}\times \beta^{e},\qquad 0\le d_i\le\beta-1,\quad e_{\min}\le e\le e_{\max}$$
 
     Ако $d_0\neq 0$ бројот е **нормализиран**. Да ги нацртаме **сите** позитивни нормализирани броеви
-    на еден мал („играчка“) систем. Обрнете внимание: броевите **не се рамномерно распоредени** –
+    на еден мал **систем за илустрација** (со мал број цифри и експоненти, за да може да се нацрта). Обрнете внимание: броевите **не се рамномерно распоредени** –
     растојанието меѓу соседни броеви се зголемува $\beta$ пати при секој нов експонент.
     """)
     return
@@ -67,18 +67,18 @@ def _(mo):
 
 @app.cell(hide_code=True)
 def _(mo):
-    toy_beta = mo.ui.dropdown(options={"2": 2, "3": 3, "10": 10}, value="2", label="Основа β")
-    toy_p = mo.ui.slider(1, 5, value=3, label="Број цифри p", show_value=True)
-    toy_emin = mo.ui.slider(-3, 0, value=-1, label="e_min", show_value=True)
-    toy_emax = mo.ui.slider(0, 3, value=2, label="e_max", show_value=True)
-    toy_log = mo.ui.checkbox(value=False, label="Логаритамска оска")
-    mo.hstack([toy_beta, toy_p, toy_emin, toy_emax, toy_log], justify="start", gap=1.5)
-    return toy_beta, toy_emax, toy_emin, toy_log, toy_p
+    ex_beta = mo.ui.dropdown(options={"2": 2, "3": 3, "10": 10}, value="2", label="Основа β")
+    ex_p = mo.ui.slider(1, 5, value=3, label="Број цифри p", show_value=True)
+    ex_emin = mo.ui.slider(-3, 0, value=-1, label="e_min", show_value=True)
+    ex_emax = mo.ui.slider(0, 3, value=2, label="e_max", show_value=True)
+    ex_log = mo.ui.checkbox(value=False, label="Логаритамска оска")
+    mo.hstack([ex_beta, ex_p, ex_emin, ex_emax, ex_log], justify="start", gap=1.5)
+    return ex_beta, ex_emax, ex_emin, ex_log, ex_p
 
 
 @app.cell(hide_code=True)
 def _(Fraction):
-    def toy_numbers(beta, p, emin, emax):
+    def ex_numbers(beta, p, emin, emax):
         """Сите позитивни нормализирани броеви: m * beta^(e-p+1), m ∈ [beta^(p-1), beta^p - 1]  (изр. 1.2)."""
         out = []
         for e in range(emin, emax + 1):
@@ -86,7 +86,7 @@ def _(Fraction):
                 out.append((Fraction(m) * Fraction(beta) ** (e - p + 1), e))
         return out
 
-    def toy_round(x, beta, p, emin, emax):
+    def ex_round(x, beta, p, emin, emax):
         """Заокружување до најблискиот број во системот (при еднаквост – парна мантиса)."""
         x = Fraction(x)
         if x == 0:
@@ -112,13 +112,13 @@ def _(Fraction):
         val = m * scale
         return s * min(val, xmax)
 
-    return toy_numbers, toy_round
+    return ex_numbers, ex_round
 
 
 @app.cell(hide_code=True)
-def _(mo, np, plt, toy_beta, toy_emax, toy_emin, toy_log, toy_numbers, toy_p):
-    _b, _p, _e1, _e2 = toy_beta.value, toy_p.value, toy_emin.value, toy_emax.value
-    _nums = toy_numbers(_b, _p, _e1, _e2)
+def _(mo, np, plt, ex_beta, ex_emax, ex_emin, ex_log, ex_numbers, ex_p):
+    _b, _p, _e1, _e2 = ex_beta.value, ex_p.value, ex_emin.value, ex_emax.value
+    _nums = ex_numbers(_b, _p, _e1, _e2)
     _vals = np.array([float(v) for v, _ in _nums])
     _exps = np.array([e for _, e in _nums])
 
@@ -130,7 +130,7 @@ def _(mo, np, plt, toy_beta, toy_emax, toy_emin, toy_log, toy_numbers, toy_p):
     _ax.vlines(0, 0, 1, color="k", lw=2)
     _ax.set_yticks([])
     _ax.set_ylim(0, 1.25)
-    if toy_log.value:
+    if ex_log.value:
         _ax.set_xscale("log")
     _ax.set_title(f"Позитивни нормализирани броеви: β={_b}, p={_p}, e ∈ [{_e1}, {_e2}]")
     _ax.legend(ncol=min(8, _e2 - _e1 + 1), loc="upper center", fontsize=8, frameon=False,
@@ -333,7 +333,7 @@ def _(mo):
 
     $$\delta = \left|\frac{x^*-x}{x}\right| \le u = \tfrac12\beta^{1-p},\qquad x^* = x(1+\delta)\quad (1.11–1.14)$$
 
-    На графикот е $\delta(x)$ за „играчка“ системот од горе (β, p, e_min, e_max се исти).
+    На графикот е $\delta(x)$ за системот за илустрација од горе (β, p, e_min, e_max се исти).
     Забележете ја **пилестата** форма: грешката е 0 точно на претставливите броеви, а највисока на средина меѓу нив;
     апсолутната грешка расте со $x$, но релативната останува под $u$.
     """)
@@ -341,12 +341,12 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(mo, np, plt, toy_beta, toy_emax, toy_emin, toy_p, toy_round):
-    _b, _p, _e1, _e2 = toy_beta.value, toy_p.value, toy_emin.value, toy_emax.value
+def _(mo, np, plt, ex_beta, ex_emax, ex_emin, ex_p, ex_round):
+    _b, _p, _e1, _e2 = ex_beta.value, ex_p.value, ex_emin.value, ex_emax.value
     _xmin = float(_b) ** _e1
     _xmax = float(_b) ** _e2 * (_b - float(_b) ** (-_p + 1))
     _xs = np.geomspace(_xmin, _xmax, 3000)
-    _xr = np.array([float(toy_round(v, _b, _p, _e1, _e2)) for v in _xs])
+    _xr = np.array([float(ex_round(v, _b, _p, _e1, _e2)) for v in _xs])
     _abs = np.abs(_xr - _xs)
     _rel = _abs / _xs
     _u = 0.5 * _b ** (1 - _p)
